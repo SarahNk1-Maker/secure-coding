@@ -18,7 +18,7 @@ int read_file(const char *filename) {
         printf("%s", buff);
     }
 
-    fclose(ptr); // Always close the file after done reading
+    fclose(ptr); // Don't forget to close the file after reading
 
     return 0;
 }
