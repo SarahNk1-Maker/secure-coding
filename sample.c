@@ -6,39 +6,40 @@
 
 int main(int argc, char** argv) {
     if (argc != 2) {
-        fprintf(stderr, "please provide the address of the file as an input.\n");
+        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
         return -1;
     }
 
-    // Validate that the input file name is safe
-    if (strpbrk(argv[1], "&;`'\"|*?~<>^()[]{}$\\") != NULL) {
-        fprintf(stderr, "Invalid characters in input.\n");
+    // Validate and sanitize input (only allow alphanumeric and safe characters for file path)
+    // Ensure input is safe to use as a filename
+    char safe_characters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-./";
+    size_t len = strlen(argv[1]);
+    for (size_t i = 0; i < len; ++i) {
+        if (strchr(safe_characters, argv[1][i]) == NULL) {
+            fprintf(stderr, "Invalid characters in filename.\n");
+            return -1;
+        }
+    }
+
+    FILE *fp = fopen(argv[1], "r");
+    if (fp == NULL) {
+        perror("Error opening file");
         return -1;
     }
 
-    // Construct the command using snprintf for safety
-    char cmd[BUFSIZE];
-    snprintf(cmd, sizeof(cmd), "wc -c < %s", argv[1]);
+    // Move file pointer to end to get file size
+    fseek(fp, 0L, SEEK_END);
+    long file_size = ftell(fp);
 
-    // Use popen to safely execute the command and read the output
-    FILE *fp;
-    char result[BUFSIZE];
-
-    if ((fp = popen(cmd, "r")) == NULL) {
-        fprintf(stderr, "Error opening pipe.\n");
+    if (file_size == -1) {
+        perror("Error getting file size");
+        fclose(fp);
         return -1;
     }
 
-    // Read the output of the command
-    if (fgets(result, sizeof(result), fp) != NULL) {
-        printf("%s", result);
-    } else {
-        fprintf(stderr, "Error reading result.\n");
-        pclose(fp);
-        return -1;
-    }
+    printf("File size: %ld bytes\n", file_size);
 
-    // Close the pipe
-    pclose(fp);
+    fclose(fp);
     return 0;
 }
+
