@@ -4,7 +4,7 @@
 
 #define BUFSIZE 256
 
-int main (int argc,char** argv) {
+int main(int argc,char** argv) {
 
 if (argc!=2) {
 fprintf(stderr,"please provide the address of the file as an input.\n");
