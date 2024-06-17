@@ -9,9 +9,14 @@ int main(int argc, char** argv) {
         fprintf(stderr, "please provide the address of the file as an input.\n");
         return -1;
     }
-    char cmd[BUFSIZE] = "wc -c < ";
+     char cmd[BUFSIZE];
+    snprintf(cmd, sizeof(cmd), "wc -c < %s", argv[1]);
 
-    strcat(cmd, argv[1]);
+    // Validate that the input does not contain any characters that could lead to command injection
+    if (strpbrk(argv[1], "&;`'\"|*?~<>^()[]{}$\\") != NULL) {
+        fprintf(stderr, "Invalid characters in input.\n");
+        return -1;
+    }
     system(cmd);
 
     return 0;
