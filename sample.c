@@ -1,27 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string.h>    
+
 #define BUFSIZE 256
-int main(int argc, char** argv) {
-    if (argc != 2) {
-        fprintf(stderr, "please provide the address of the file as an input.\n");
-        return -1;
+                                
+int read_file(const char *filename) {
+    FILE* ptr = fopen(filename, "r");
+                                
+    if (ptr == NULL) {
+        printf("File cannot be opened.\n");
+        return(-1);
     }
-    char cmd[BUFSIZE] = "wc -c < ";
-
-    strcat(cmd, argv[1]);
-    char cmd[BUFSIZE];
-    snprintf(cmd, sizeof(cmd), "wc -c < %s", argv[1]);
-
-    // Validate that the input does not contain any characters that could lead to command injection
-    if (strpbrk(argv[1], "&;`'\"|*?~<>^()[]{}$\\") != NULL) {
-        fprintf(stderr, "Invalid characters in input.\n");
-        return -1;
+                                
+    char buff[BUFSIZE];
+                                
+    while (fgets(buff, BUFSIZE, ptr) != NULL) {
+        printf("%s", buff);
     }
-
-    system(cmd);
-
-    return 0;
+        
+    return 0; 
 }
-
 
